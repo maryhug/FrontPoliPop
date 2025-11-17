@@ -1,6 +1,6 @@
 import React, { useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Lock, User, Calendar, Users, Globe, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, User, Calendar, Users, Globe, Eye, EyeOff, Film } from "lucide-react";
 import { apiService } from "../services/api";
 import "../Styles/login.css";
 import logo from "../assets/logo.png";
@@ -8,12 +8,14 @@ import logo from "../assets/logo.png";
 const RegisterInicial: React.FC = () => {
     const [formData, setFormData] = useState({
         fullname: "",
+        username: "",
         email: "",
         password: "",
         confirmPassword: "",
         birthdate: "",
         gender: "",
-        country: ""
+        country: "",
+        favoriteMovie: ""
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -48,18 +50,16 @@ const RegisterInicial: React.FC = () => {
         }
 
         try {
-            // Generar username del email (parte antes del @)
-            const username = formData.email.split('@')[0];
-
             // Preparar datos para el registro usando la interfaz User
             const userData = {
-                username: username,
+                username: formData.username,
                 passwordHash: formData.password,
                 email: formData.email,
                 fullName: formData.fullname,
                 birthdate: formData.birthdate,
                 gender: formData.gender,
-                country: formData.country
+                country: formData.country,
+                favoriteMovie: formData.favoriteMovie
             };
 
             // Usar el método createUser que ya existe en api.ts
@@ -144,6 +144,23 @@ const RegisterInicial: React.FC = () => {
                                     disabled={loading}
                                     className="w-full pl-10 pr-4 py-3 bg-neutral-900/50 border border-neutral-700/50 rounded-xl text-white placeholder-neutral-500 focus:border-purple-600/50 focus:bg-neutral-900/70 focus:shadow-[0_0_15px_rgba(87,35,100,0.2)] transition-all duration-200 outline-none text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="Nombre completo"
+                                />
+                            </div>
+
+                            {/* Campo Username */}
+                            <div className="relative group">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <User className="h-4 w-4 text-neutral-500 group-focus-within:text-purple-500 transition-colors duration-200" />
+                                </div>
+                                <input
+                                    type="text"
+                                    name="username"
+                                    value={formData.username}
+                                    onChange={handleChange}
+                                    required
+                                    disabled={loading}
+                                    className="w-full pl-10 pr-4 py-3 bg-neutral-900/50 border border-neutral-700/50 rounded-xl text-white placeholder-neutral-500 focus:border-purple-600/50 focus:bg-neutral-900/70 focus:shadow-[0_0_15px_rgba(87,35,100,0.2)] transition-all duration-200 outline-none text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                    placeholder="Nombre de usuario"
                                 />
                             </div>
 
@@ -305,6 +322,23 @@ const RegisterInicial: React.FC = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                 </svg>
                             </div>
+                        </div>
+
+                        {/* Campo Película Favorita - Ancho completo */}
+                        <div className="relative group">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <Film className="h-4 w-4 text-neutral-500 group-focus-within:text-purple-500 transition-colors duration-200" />
+                            </div>
+                            <input
+                                type="text"
+                                name="favoriteMovie"
+                                value={formData.favoriteMovie}
+                                onChange={handleChange}
+                                required
+                                disabled={loading}
+                                className="w-full pl-10 pr-4 py-3 bg-neutral-900/50 border border-neutral-700/50 rounded-xl text-white placeholder-neutral-500 focus:border-purple-600/50 focus:bg-neutral-900/70 focus:shadow-[0_0_15px_rgba(87,35,100,0.2)] transition-all duration-200 outline-none text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                placeholder="Tu película favorita"
+                            />
                         </div>
 
                         {/* Botón de registro */}
