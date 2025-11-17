@@ -15,7 +15,8 @@ const RegisterInicial: React.FC = () => {
         birthdate: "",
         gender: "",
         country: "",
-        favoriteMovie: ""
+        favoriteMovie: "",
+        role: "user" // agregado y valor por defecto
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -59,7 +60,8 @@ const RegisterInicial: React.FC = () => {
                 birthdate: formData.birthdate,
                 gender: formData.gender,
                 country: formData.country,
-                favoriteMovie: formData.favoriteMovie
+                favoriteMovie: formData.favoriteMovie,
+                role: "user" // role quemado
             };
 
             // Usar el método createUser que ya existe en api.ts
@@ -86,7 +88,6 @@ const RegisterInicial: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-black via-neutral-950 to-black flex items-center justify-center p-4 relative overflow-hidden">
-            {/* Efectos de fondo sutiles */}
             <div className="absolute inset-0">
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-950/10 via-transparent to-purple-900/10"></div>
                 <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-purple-600/5 rounded-full blur-3xl"></div>
@@ -94,7 +95,6 @@ const RegisterInicial: React.FC = () => {
             </div>
 
             <div className="w-full max-w-2xl relative z-10 py-8">
-                {/* Logo */}
                 <div className="text-center mb-8">
                     <div className="flex justify-center mb-4">
                         <img
@@ -121,16 +121,13 @@ const RegisterInicial: React.FC = () => {
                             </p>
                         </div>
 
-                        {/* Mensaje de error */}
                         {error && (
                             <div className="bg-purple-500/10 border border-purple-500/50 rounded-xl p-3 text-purple-400 text-sm text-center">
                                 {error}
                             </div>
                         )}
 
-                        {/* Grid de campos - 2 columnas en pantallas medianas */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Campo Nombre Completo */}
                             <div className="relative group">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <User className="h-4 w-4 text-neutral-500 group-focus-within:text-purple-500 transition-colors duration-200" />
@@ -147,7 +144,6 @@ const RegisterInicial: React.FC = () => {
                                 />
                             </div>
 
-                            {/* Campo Username */}
                             <div className="relative group">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <User className="h-4 w-4 text-neutral-500 group-focus-within:text-purple-500 transition-colors duration-200" />
@@ -164,7 +160,6 @@ const RegisterInicial: React.FC = () => {
                                 />
                             </div>
 
-                            {/* Campo Email */}
                             <div className="relative group">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <Mail className="h-4 w-4 text-neutral-500 group-focus-within:text-purple-500 transition-colors duration-200" />
@@ -181,7 +176,6 @@ const RegisterInicial: React.FC = () => {
                                 />
                             </div>
 
-                            {/* Campo Contraseña */}
                             <div className="relative group">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <Lock className="h-4 w-4 text-neutral-500 group-focus-within:text-purple-500 transition-colors duration-200" />
@@ -209,7 +203,6 @@ const RegisterInicial: React.FC = () => {
                                 </button>
                             </div>
 
-                            {/* Campo Confirmar Contraseña */}
                             <div className="relative group">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <Lock className="h-4 w-4 text-neutral-500 group-focus-within:text-purple-500 transition-colors duration-200" />
@@ -237,7 +230,6 @@ const RegisterInicial: React.FC = () => {
                                 </button>
                             </div>
 
-                            {/* Campo Fecha de Nacimiento */}
                             <div className="relative group">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <Calendar className="h-4 w-4 text-neutral-500 group-focus-within:text-purple-500 transition-colors duration-200" />
@@ -253,7 +245,6 @@ const RegisterInicial: React.FC = () => {
                                 />
                             </div>
 
-                            {/* Campo Género */}
                             <div className="relative group">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                                     <Users className="h-4 w-4 text-neutral-500 group-focus-within:text-purple-500 transition-colors duration-200" />
@@ -280,7 +271,6 @@ const RegisterInicial: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Campo País - Ancho completo */}
                         <div className="relative group">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                                 <Globe className="h-4 w-4 text-neutral-500 group-focus-within:text-purple-500 transition-colors duration-200" />
@@ -324,7 +314,6 @@ const RegisterInicial: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Campo Película Favorita - Ancho completo */}
                         <div className="relative group">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <Film className="h-4 w-4 text-neutral-500 group-focus-within:text-purple-500 transition-colors duration-200" />
@@ -341,7 +330,6 @@ const RegisterInicial: React.FC = () => {
                             />
                         </div>
 
-                        {/* Botón de registro */}
                         <button
                             onClick={handleSubmit}
                             disabled={loading}
@@ -353,7 +341,6 @@ const RegisterInicial: React.FC = () => {
                             </span>
                         </button>
 
-                        {/* Divisor */}
                         <div className="relative my-6">
                             <div className="absolute inset-0 flex items-center">
                                 <div className="w-full border-t border-neutral-700/50"></div>
@@ -363,7 +350,6 @@ const RegisterInicial: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Login */}
                         <div className="text-center">
                             <p className="text-neutral-400 text-sm">
                                 ¿Ya tienes cuenta?{" "}
@@ -379,7 +365,6 @@ const RegisterInicial: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Texto inferior */}
                 <div className="text-center mt-6">
                     <p className="text-neutral-500 text-xs">
                         © 2025 PeliPop. Todos los derechos reservados.
