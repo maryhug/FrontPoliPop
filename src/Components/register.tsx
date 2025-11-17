@@ -15,8 +15,9 @@ const RegisterInicial: React.FC = () => {
         birthdate: "",
         gender: "",
         country: "",
-        favoriteMovie: "",
-        role: "user" // agregado y valor por defecto
+        favoriteMovieId: "", // Cambiado de favoriteMovie a favoriteMovieId
+        phone: "", // Agregado campo phone
+        role: "USER" // Cambiado a USER en mayúsculas para coincidir con el backend
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -51,7 +52,7 @@ const RegisterInicial: React.FC = () => {
         }
 
         try {
-            // Preparar datos para el registro usando la interfaz User
+            // Preparar datos para el registro
             const userData = {
                 username: formData.username,
                 passwordHash: formData.password,
@@ -60,11 +61,11 @@ const RegisterInicial: React.FC = () => {
                 birthdate: formData.birthdate,
                 gender: formData.gender,
                 country: formData.country,
-                favoriteMovie: formData.favoriteMovie,
-                role: "user" // role quemado
+                phone: formData.phone || undefined, // Opcional
+                favoriteMovieId: formData.favoriteMovieId ? parseInt(formData.favoriteMovieId) : undefined, // Convertir a número
+                role: "USER"
             };
 
-            // Usar el método createUser que ya existe en api.ts
             const data = await apiService.createUser(userData);
             console.log("✅ Registro exitoso:", data);
 
@@ -108,9 +109,7 @@ const RegisterInicial: React.FC = () => {
                     </p>
                 </div>
 
-                <div
-                    className="bg-black/70 backdrop-blur-xl rounded-2xl border border-neutral-800/50 p-6 shadow-[0_8px_40px_rgba(0,0,0,0.8)]"
-                >
+                <div className="bg-black/70 backdrop-blur-xl rounded-2xl border border-neutral-800/50 p-6 shadow-[0_8px_40px_rgba(0,0,0,0.8)]">
                     <div className="space-y-4">
                         <div className="text-center mb-6">
                             <h2 className="text-xl text-white font-semibold mb-1">
@@ -258,10 +257,10 @@ const RegisterInicial: React.FC = () => {
                                     className="w-full pl-10 pr-4 py-3 bg-neutral-900/50 border border-neutral-700/50 rounded-xl text-white placeholder-neutral-500 focus:border-purple-600/50 focus:bg-neutral-900/70 focus:shadow-[0_0_15px_rgba(87,35,100,0.2)] transition-all duration-200 outline-none text-sm disabled:opacity-50 disabled:cursor-not-allowed appearance-none cursor-pointer"
                                 >
                                     <option value="" className="bg-neutral-900">Seleccionar género...</option>
-                                    <option value="male" className="bg-neutral-900">Masculino</option>
-                                    <option value="female" className="bg-neutral-900">Femenino</option>
-                                    <option value="other" className="bg-neutral-900">Otro</option>
-                                    <option value="prefer-not" className="bg-neutral-900">Prefiero no decir</option>
+                                    <option value="M" className="bg-neutral-900">Masculino</option>
+                                    <option value="F" className="bg-neutral-900">Femenino</option>
+                                    <option value="O" className="bg-neutral-900">Otro</option>
+                                    <option value="N" className="bg-neutral-900">Prefiero no decir</option>
                                 </select>
                                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                                     <svg className="w-4 h-4 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -319,14 +318,13 @@ const RegisterInicial: React.FC = () => {
                                 <Film className="h-4 w-4 text-neutral-500 group-focus-within:text-purple-500 transition-colors duration-200" />
                             </div>
                             <input
-                                type="text"
-                                name="favoriteMovie"
-                                value={formData.favoriteMovie}
+                                type="number"
+                                name="favoriteMovieId"
+                                value={formData.favoriteMovieId}
                                 onChange={handleChange}
-                                required
                                 disabled={loading}
                                 className="w-full pl-10 pr-4 py-3 bg-neutral-900/50 border border-neutral-700/50 rounded-xl text-white placeholder-neutral-500 focus:border-purple-600/50 focus:bg-neutral-900/70 focus:shadow-[0_0_15px_rgba(87,35,100,0.2)] transition-all duration-200 outline-none text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                                placeholder="Tu película favorita"
+                                placeholder="ID de película favorita (opcional)"
                             />
                         </div>
 
