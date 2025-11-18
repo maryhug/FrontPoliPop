@@ -1,9 +1,11 @@
+// src/pages/RegisterInicial.tsx
 import React, { useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Lock, User, Calendar, Users, Globe, Eye, EyeOff, Film } from "lucide-react";
+import { Mail, Lock, User, Calendar, Users, Globe, Eye, EyeOff, Phone } from "lucide-react";
 import { apiService } from "../services/api";
 import "../Styles/login.css";
 import logo from "../assets/logo.png";
+import MovieSearch from "../Components/MovieSearch";
 
 const RegisterInicial: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -15,9 +17,9 @@ const RegisterInicial: React.FC = () => {
         birthdate: "",
         gender: "",
         country: "",
-        favoriteMovieId: "", // Cambiado de favoriteMovie a favoriteMovieId
-        phone: "", // Agregado campo phone
-        role: "USER" // Cambiado a USER en mayúsculas para coincidir con el backend
+        favoriteMovieId: "",
+        phone: "",
+        role: "USER",
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -38,7 +40,6 @@ const RegisterInicial: React.FC = () => {
         setLoading(true);
         setError("");
 
-        // Validaciones
         if (formData.password !== formData.confirmPassword) {
             setError("Las contraseñas no coinciden");
             setLoading(false);
@@ -52,7 +53,6 @@ const RegisterInicial: React.FC = () => {
         }
 
         try {
-            // Preparar datos para el registro
             const userData = {
                 username: formData.username,
                 passwordHash: formData.password,
@@ -61,19 +61,18 @@ const RegisterInicial: React.FC = () => {
                 birthdate: formData.birthdate,
                 gender: formData.gender,
                 country: formData.country,
-                phone: formData.phone || undefined, // Opcional
-                favoriteMovieId: formData.favoriteMovieId ? parseInt(formData.favoriteMovieId) : undefined, // Convertir a número
-                role: "USER"
+                phone: formData.phone || undefined,
+                favoriteMovieId: formData.favoriteMovieId ? parseInt(formData.favoriteMovieId, 10) : undefined,
+                role: "USER",
             };
 
             const data = await apiService.createUser(userData);
             console.log("✅ Registro exitoso:", data);
 
-            // Navegar al login después del registro exitoso
             navigate("/login", {
                 state: {
-                    message: "¡Cuenta creada exitosamente! Inicia sesión para continuar."
-                }
+                    message: "¡Cuenta creada exitosamente! Inicia sesión para continuar.",
+                },
             });
         } catch (error) {
             console.error("Error al registrarse:", error);
@@ -98,26 +97,16 @@ const RegisterInicial: React.FC = () => {
             <div className="w-full max-w-2xl relative z-10 py-8">
                 <div className="text-center mb-8">
                     <div className="flex justify-center mb-4">
-                        <img
-                            src={logo}
-                            alt="PeliPop Logo"
-                            className="h-20 w-auto object-contain"
-                        />
+                        <img src={logo} alt="PeliPop Logo" className="h-20 w-auto object-contain" />
                     </div>
-                    <p className="text-neutral-400 text-sm">
-                        Disfruta películas sin límites
-                    </p>
+                    <p className="text-neutral-400 text-sm">Disfruta películas sin límites</p>
                 </div>
 
                 <div className="bg-black/70 backdrop-blur-xl rounded-2xl border border-neutral-800/50 p-6 shadow-[0_8px_40px_rgba(0,0,0,0.8)]">
                     <div className="space-y-4">
                         <div className="text-center mb-6">
-                            <h2 className="text-xl text-white font-semibold mb-1">
-                                Crear Cuenta Nueva
-                            </h2>
-                            <p className="text-neutral-400 text-sm">
-                                Únete y disfruta miles de películas
-                            </p>
+                            <h2 className="text-xl text-white font-semibold mb-1">Crear Cuenta Nueva</h2>
+                            <p className="text-neutral-400 text-sm">Únete y disfruta miles de películas</p>
                         </div>
 
                         {error && (
@@ -172,6 +161,21 @@ const RegisterInicial: React.FC = () => {
                                     disabled={loading}
                                     className="w-full pl-10 pr-4 py-3 bg-neutral-900/50 border border-neutral-700/50 rounded-xl text-white placeholder-neutral-500 focus:border-purple-600/50 focus:bg-neutral-900/70 focus:shadow-[0_0_15px_rgba(87,35,100,0.2)] transition-all duration-200 outline-none text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="Correo electrónico"
+                                />
+                            </div>
+
+                            <div className="relative group">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Phone className="h-4 w-4 text-neutral-500 group-focus-within:text-purple-500 transition-colors duration-200" />
+                                </div>
+                                <input
+                                    type="tel"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleChange}
+                                    disabled={loading}
+                                    className="w-full pl-10 pr-4 py-3 bg-neutral-900/50 border border-neutral-700/50 rounded-xl text-white placeholder-neutral-500 focus:border-purple-600/50 focus:bg-neutral-900/70 focus:shadow-[0_0_15px_rgba(87,35,100,0.2)] transition-all duration-200 outline-none text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                    placeholder="Teléfono (opcional)"
                                 />
                             </div>
 
@@ -315,17 +319,20 @@ const RegisterInicial: React.FC = () => {
 
                         <div className="relative group">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Film className="h-4 w-4 text-neutral-500 group-focus-within:text-purple-500 transition-colors duration-200" />
                             </div>
-                            <input
-                                type="number"
-                                name="favoriteMovieId"
-                                value={formData.favoriteMovieId}
-                                onChange={handleChange}
-                                disabled={loading}
-                                className="w-full pl-10 pr-4 py-3 bg-neutral-900/50 border border-neutral-700/50 rounded-xl text-white placeholder-neutral-500 focus:border-purple-600/50 focus:bg-neutral-900/70 focus:shadow-[0_0_15px_rgba(87,35,100,0.2)] transition-all duration-200 outline-none text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                                placeholder="ID de película favorita (opcional)"
-                            />
+
+                            <div className="w-full">
+                                <MovieSearch
+                                    onSelect={(movie) => {
+                                        setFormData((prev) => ({ ...prev, favoriteMovieId: String(movie.id) }));
+                                    }}
+                                />
+                                {formData.favoriteMovieId && (
+                                    <div className="text-sm text-neutral-400 mt-2">
+                                        Película seleccionada: ID {formData.favoriteMovieId}
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         <button
@@ -334,21 +341,10 @@ const RegisterInicial: React.FC = () => {
                             className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 px-6 rounded-xl hover:from-purple-700 hover:to-purple-800 transform hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 shadow-[0_4px_20px_rgba(87,35,100,0.4)] hover:shadow-[0_6px_25px_rgba(87,35,100,0.5)] relative overflow-hidden group text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 ease-out"></div>
-                            <span className="relative">
-                                {loading ? "Creando cuenta..." : "Crear Cuenta"}
-                            </span>
+                            <span className="relative">{loading ? "Creando cuenta..." : "Crear Cuenta"}</span>
                         </button>
 
-                        <div className="relative my-6">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-neutral-700/50"></div>
-                            </div>
-                            <div className="relative flex justify-center text-xs">
-                                <span className="px-3 bg-black/70 text-neutral-500">o</span>
-                            </div>
-                        </div>
-
-                        <div className="text-center">
+                        <div className="text-center mt-6">
                             <p className="text-neutral-400 text-sm">
                                 ¿Ya tienes cuenta?{" "}
                                 <a
@@ -364,9 +360,7 @@ const RegisterInicial: React.FC = () => {
                 </div>
 
                 <div className="text-center mt-6">
-                    <p className="text-neutral-500 text-xs">
-                        © 2025 PeliPop. Todos los derechos reservados.
-                    </p>
+                    <p className="text-neutral-500 text-xs">© 2025 PeliPop. Todos los derechos reservados.</p>
                 </div>
             </div>
         </div>

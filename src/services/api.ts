@@ -58,29 +58,29 @@ class ApiService {
   }
 
   // LOGIN
-async login(loginRequest: LoginRequest): Promise<AuthResponse> {
-  const url = `${this.baseUrl}/auth/login`;
-  console.log('🔍 Intentando login en:', url);
-  console.log('📤 Datos enviados:', loginRequest);
-  
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(loginRequest),
-  });
+  async login(loginRequest: LoginRequest): Promise<AuthResponse> {
+    const url = `${this.baseUrl}/auth/login`;
+    console.log('🔍 Intentando login en:', url);
+    console.log('📤 Datos enviados:', loginRequest);
 
-  console.log('📥 Estado de respuesta:', response.status);
-  
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error('❌ Error del servidor:', errorText);
-    throw new Error('Credenciales incorrectas');
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(loginRequest),
+    });
+
+    console.log('📥 Estado de respuesta:', response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => '');
+      console.error('❌ Error del servidor:', errorText);
+      throw new Error('Credenciales incorrectas');
+    }
+
+    return response.json();
   }
-
-  return response.json();
-}
 
   // CREAR USUARIO
   async createUser(user: UserSave): Promise<UserSave> {
@@ -91,7 +91,9 @@ async login(loginRequest: LoginRequest): Promise<AuthResponse> {
     });
 
     if (!response.ok) {
-      throw new Error('Error al crear usuario');
+      // intento parsear mensaje de error
+      const err = await response.json().catch(() => ({ message: response.statusText }));
+      throw new Error(err.message || 'Error al crear usuario');
     }
 
     return response.json();
@@ -127,7 +129,7 @@ async login(loginRequest: LoginRequest): Promise<AuthResponse> {
 
   // OBTENER USUARIO POR EMAIL
   async getUserByEmail(email: string): Promise<User> {
-    const response = await fetch(`${this.baseUrl}/users/email/${email}`, {
+    const response = await fetch(`${this.baseUrl}/users/email/${encodeURIComponent(email)}`, {
       method: 'GET',
       headers: this.getAuthHeaders(),
     });
@@ -141,7 +143,7 @@ async login(loginRequest: LoginRequest): Promise<AuthResponse> {
 
   // OBTENER USUARIO POR USERNAME
   async getUserByUsername(username: string): Promise<User> {
-    const response = await fetch(`${this.baseUrl}/users/name/${username}`, {
+    const response = await fetch(`${this.baseUrl}/users/name/${encodeURIComponent(username)}`, {
       method: 'GET',
       headers: this.getAuthHeaders(),
     });
@@ -178,6 +180,36 @@ async login(loginRequest: LoginRequest): Promise<AuthResponse> {
     if (!response.ok) {
       throw new Error('Error al eliminar usuario');
     }
+  }
+
+  // Ejemplo: Buscar películas (usa el endpoint del backend)
+  async searchMovies(query: string): Promise<any[]> {
+    if (!query || query.trim().length === 0) return [];
+    const q = encodeURIComponent(query.trim());
+    const url = `${this.baseUrl}/movies/search?query=${q}`;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: this.getAuthHeaders(), // no hace daño incluir token si existe
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      throw new Error(`Error buscando películas: ${res.status} ${text}`);
+    }
+    return res.json();
+  }
+
+  // Obtener detalles de película por id
+  async getMovieDetails(id: number): Promise<any> {
+    const url = `${this.baseUrl}/movies/details/${id}`;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: this.getAuthHeaders(),
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      throw new Error(`Error obteniendo detalles de la película: ${res.status} ${text}`);
+    }
+    return res.json();
   }
 
   // LOGOUT (limpiar localStorage)

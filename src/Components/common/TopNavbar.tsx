@@ -1,9 +1,18 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import './TopNavbar.css';
 
 const TopNavbar: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Rutas donde ocultar la navbar
+    const hideNavbarPaths = ['/register', '/login'];
+
+    // Si la ruta actual coincide o empieza con alguna ruta a ocultar, no renderizar navbar
+    if (hideNavbarPaths.some(path => location.pathname.startsWith(path))) {
+        return null;
+    }
 
     const handleLogout = (): void => {
         // Limpiar datos de sesión
@@ -27,19 +36,19 @@ const TopNavbar: React.FC = () => {
                 {/* Navigation Links */}
                 <ul className="navbar-menu">
                     <li className="navbar-item">
-                        <a href="/explorar" className="navbar-link">
+                        <Link to="/explorar" className="navbar-link">
                             Explorar
-                        </a>
+                        </Link>
                     </li>
                     <li className="navbar-item">
-                        <a href="/novedades" className="navbar-link">
+                        <Link to="/novedades" className="navbar-link">
                             Novedades
-                        </a>
+                        </Link>
                     </li>
                     <li className="navbar-item">
-                        <a href="/mi-lista" className="navbar-link">
+                        <Link to="/mi-lista" className="navbar-link">
                             Mi Lista
-                        </a>
+                        </Link>
                     </li>
                 </ul>
 
