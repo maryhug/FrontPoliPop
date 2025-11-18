@@ -1,4 +1,5 @@
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
 import { apiService } from "../services/api";
@@ -29,8 +30,37 @@ const LoginInicial: React.FC = () => {
 
             console.log("✅ Login correcto:", data);
 
+            // Guardar token primero para que las siguientes llamadas lleven Authorization
             localStorage.setItem("token", data.token);
-            localStorage.setItem("user", JSON.stringify(data));
+
+            // Construir payload base del usuario autenticado
+            let storedUser: any = {
+                id: data.id,
+                email: data.email,
+                username: data.username,
+                role: data.role, // por si el backend ya lo trae
+                gender: data.gender,
+            };
+
+            // Intentar enriquecer con datos completos (incluye role) desde el backend
+            try {
+                const backendUser = await apiService.getUserByEmail(data.email);
+                if (backendUser) {
+                    storedUser = {
+                        ...storedUser,
+                        id: backendUser.id ?? storedUser.id,
+                        username: backendUser.username ?? storedUser.username,
+                        role: backendUser.role ?? storedUser.role,
+                        gender: backendUser.gender ?? storedUser.gender,
+                        birthdate: backendUser.birthdate ?? storedUser.birthdate,
+                    };
+                }
+            } catch (innerErr) {
+                console.warn("No se pudo enriquecer datos de usuario, usando mínimos:", innerErr);
+            }
+
+            // Guardar usuario en localStorage (usado por isAdmin / navbar)
+            localStorage.setItem("user", JSON.stringify(storedUser));
 
             // Navegar al catálogo (home)
             navigate("/home");

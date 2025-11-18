@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import './TopNavbar.css';
+import { isAdmin } from '../../services/auth';
 
 const TopNavbar: React.FC = () => {
     const navigate = useNavigate();
@@ -50,11 +51,13 @@ const TopNavbar: React.FC = () => {
                             Mi Lista
                         </Link>
                     </li>
-                    <li className="navbar-item">
-                        <Link to="/admin" className="navbar-link">
-                            Admin
-                        </Link>
-                    </li>
+                    {isAdmin() && (
+                      <li className="navbar-item">
+                          <Link to="/admin" className="navbar-link admin-link" title="Panel de Administración">
+                              <span>Admin</span>
+                          </Link>
+                      </li>
+                    )}
                 </ul>
 
                 {/* Logout Icon */}

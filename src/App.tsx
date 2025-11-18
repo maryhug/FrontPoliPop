@@ -5,6 +5,7 @@ import Catalog from './Components/catalogStatus/catalog.tsx';
 import RegisterInicial from "./Components/register.tsx";
 import TopNavBar from './Components/common/TopNavbar.tsx'; // Ajusta la ruta según tu estructura
 import AdminDashboard from './Components/admin/AdminDashboard.tsx';
+import { isAdmin } from './services/auth';
 
 const AppContent: React.FC = () => {
     const location = useLocation();
@@ -32,7 +33,7 @@ const AppContent: React.FC = () => {
                 />
                 <Route
                     path="/admin"
-                    element={<AdminDashboard />}
+                    element={isAdmin() ? <AdminDashboard /> : <Navigate to="/home" replace />}
                 />
                 <Route
                     path="/"

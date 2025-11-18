@@ -49,6 +49,10 @@ const Catalog: React.FC = () => {
   const [details, setDetails] = useState<TMDBmovieDTO | null>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
 
+  // búsqueda
+  const [query, setQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+
   // Verificar autenticación al montar el componente
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -57,24 +61,57 @@ const Catalog: React.FC = () => {
     }
   }, [navigate]);
 
-  // Obtener películas populares
-  useEffect(() => {
-    let mounted = true;
+  const loadPopular = async () => {
     setLoading(true);
-    apiService.getPopularMovies()
-      .then((movies) => {
-        if (!mounted) return;
-        const mapped: CardMovie[] = (movies || []).map((m) => mapMovieToCard(m));
-        setList(mapped);
-      })
-      .catch((e) => {
-        console.error(e);
-        if (!mounted) return;
-        setError('No se pudo cargar el catálogo');
-      })
-      .finally(() => mounted && setLoading(false));
-    return () => { mounted = false; };
+    setError('');
+    try {
+      const movies = await apiService.getPopularMovies();
+      const mapped: CardMovie[] = (movies || []).map((m) => mapMovieToCard(m));
+      setList(mapped);
+    } catch (e: any) {
+      console.error(e);
+      setError('No se pudo cargar el catálogo');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Obtener películas populares al inicio
+  useEffect(() => {
+    loadPopular();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const doSearch = async () => {
+    const q = query.trim();
+    if (!q) {
+      setIsSearching(false);
+      await loadPopular();
+      return;
+    }
+    setLoading(true);
+    setError('');
+    setIsSearching(true);
+    try {
+      const movies = await apiService.searchMovies(q);
+      const mapped: CardMovie[] = (movies || []).map((m) => mapMovieToCard(m));
+      setList(mapped);
+      if (!movies || movies.length === 0) {
+        setError('No se encontraron resultados.');
+      }
+    } catch (e: any) {
+      console.error(e);
+      setError('No se pudo realizar la búsqueda');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const clearSearch = async () => {
+    setQuery('');
+    setIsSearching(false);
+    await loadPopular();
+  };
 
   // Abrir modal con detalles de la película
   const openModal = async (id: number) => {
@@ -93,7 +130,46 @@ const Catalog: React.FC = () => {
 
   return (
     <div className="catalog-container">
-      <h2 className="catalog-title">Catálogo de Películas</h2>
+      <div className="catalog-header">
+        <h2 className="catalog-title">
+          <span className="catalog-title-icon" aria-hidden>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 5a2 2 0 0 1 2-2h11l2 2h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5Zm2 0v10h14V7h-2.17l-2-2H5Z"/>
+            </svg>
+          </span>
+          Catálogo de películas
+        </h2>
+        <div className="catalog-search">
+          <div className="search-wrap">
+            <span className="search-icon" aria-hidden>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 2a8 8 0 1 0 5.29 14.06l4.33 4.33 1.41-1.41-4.33-4.33A8 8 0 0 0 10 2Zm0 2a6 6 0 1 1 0 12A6 6 0 0 1 10 4Z"/>
+              </svg>
+            </span>
+            <input
+              type="text"
+              placeholder="Buscar películas..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') doSearch(); }}
+              className="search-input"
+              aria-label="Buscar películas"
+            />
+            <div className="search-actions">
+              <button className="search-btn" onClick={doSearch} title="Buscar" aria-label="Buscar">Buscar</button>
+              <button className="clear-btn" onClick={clearSearch} disabled={!query && !isSearching} title="Limpiar" aria-label="Limpiar">Limpiar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3 className="section-title">
+        {isSearching && query ? (
+          <>Resultados de búsqueda <span className="catalog-sub">“{query}”</span></>
+        ) : (
+          <>Películas Populares</>
+        )}
+      </h3>
 
       {loading ? (
         <div className="loading">Cargando…</div>

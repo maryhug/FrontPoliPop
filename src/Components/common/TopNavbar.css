@@ -11,8 +11,8 @@
 
 .navbar-container {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -28,7 +28,10 @@
 }
 
 .navbar-menu {
+    flex: 1;
     display: flex;
+    justify-content: center;
+    align-items: center;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -46,6 +49,10 @@
     padding: 0.5rem 1rem;
     border-radius: 4px;
     transition: background-color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    line-height: 1;
 }
 
 .navbar-link:hover {
@@ -78,6 +85,25 @@
     width: 24px;
     height: 24px;
 }
+
+/* Enlace Admin morado distintivo */
+.admin-link {
+  background: linear-gradient(90deg, rgba(124,58,237,.15), rgba(109,40,217,.15));
+  border: 1px solid rgba(124,58,237,.45);
+  color: #e9d5ff;
+  display: inline-flex;
+  align-items: center;
+  gap:.4rem;
+  box-shadow: 0 4px 14px rgba(124,58,237,.25);
+  padding: 0.5rem 1rem;
+}
+.admin-link:hover {
+  background: linear-gradient(90deg, rgba(124,58,237,.25), rgba(109,40,217,.25));
+  border-color: rgba(124,58,237,.7);
+  box-shadow: 0 6px 18px rgba(124,58,237,.35);
+}
+.admin-link-icon { display:inline-flex; align-items:center; }
+.admin-link-icon svg { width:16px; height:16px; }
 
 @media (max-width: 768px) {
     .navbar-container {

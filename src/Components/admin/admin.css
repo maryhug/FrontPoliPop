@@ -1,5 +1,12 @@
-.admin-container { padding: 1.25rem; min-height: 100vh; background: #000; color: #fff; }
+.admin-container {
+  padding: 1.25rem;
+  padding-top: 96px;
+  min-height: 100vh;
+  background: #000;
+  color: #fff;
+}
 .admin-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+.admin-header h2 { font-size: 2rem; line-height: 1.2; font-weight: 800; letter-spacing: .3px; margin: 0; }
 .admin-subtitle { color: #fff; font-size: .95rem; margin-top: .25rem; }
 .admin-actions { display: flex; gap: .5rem; }
 
@@ -8,10 +15,16 @@
 .btn:disabled { opacity:.6; cursor:not-allowed; }
 .btn-outline { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.35); padding: .6rem .9rem; border-radius: .6rem; cursor: pointer; }
 
+/* Botón de eliminación */
+.btn-danger { background: linear-gradient(90deg,#7c3aed,#6d28d9); color: #fff; border: none; padding: .6rem .9rem; border-radius: .6rem; cursor: pointer; box-shadow: 0 4px 18px rgba(124,58,237,.35); }
+.btn-danger:disabled { opacity:.6; cursor:not-allowed; }
+.btn-danger:hover:not(:disabled) { filter: brightness(1.05); }
+
 /* Fila y cards */
 .admin-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
 .admin-card { background: rgba(26,26,26,.85); border: 1px solid rgba(124,58,237,.4); border-radius: 12px; padding: 1rem; }
 .admin-card-header { display:flex; align-items:center; gap:.75rem; margin-bottom:.75rem; }
+.admin-card-header h3 { margin: 0; font-size: 1.35rem; }
 .spacer { flex: 1; }
 .admin-hint { color:#9ae6b4; font-size: .9rem; margin-bottom:.5rem; }
 
@@ -21,11 +34,21 @@
 .kpi-key { color:#fff; font-size:.85rem; }
 .kpi-val { color:#fff; font-weight:700; font-size:1.1rem; }
 
+/* KPI ancho completo y lista de píldoras */
+.kpi-item--wide { grid-column: 1 / -1; }
+.kpi-list { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.35rem; }
+.kpi-pill { background: rgba(124,58,237,.2); border:1px solid rgba(124,58,237,.35); color:#e9d5ff; border-radius:999px; padding:.25rem .6rem; font-size:.9rem; }
+
 /* Formulario búsqueda */
 .admin-form { display:grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.admin-form { gap: 1rem; }
 .form-row { display:flex; flex-direction:column; gap:.25rem; }
-.form-row label { color:#fff; font-size:.9rem; }
+.form-row label { color:#fff; font-size: 1rem; }
 .form-row input { background: rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.15); color:#fff; border-radius:.5rem; padding:.5rem .6rem; }
+.input-wrap { position: relative; display:flex; align-items:center; }
+.input-icon { position:absolute; left:10px; color:#bfaaff; display:flex; align-items:center; }
+.input-wrap input { width:100%; padding-left:34px; border:1px solid rgba(124,58,237,.35); border-radius:.5rem; background: rgba(0,0,0,.4); color:#fff; height: 38px; }
+.input-wrap input:focus { outline:none; border-color: rgba(124,58,237,.8); box-shadow: 0 0 0 2px rgba(124,58,237,.25); }
 .form-actions { grid-column: 1 / -1; display:flex; gap:.5rem; }
 
 /* Tabla */
@@ -36,7 +59,46 @@
 .admin-loading, .admin-error, .admin-muted { color:#fff; padding:.5rem 0; }
 .admin-error { color:#ff9aa2; }
 
+/* Mantener acciones en una línea */
+.admin-table td:last-child { white-space: nowrap; }
+
+/* Badges */
+.badge { display:inline-block; padding:.2rem .5rem; border-radius:.5rem; background: rgba(124,58,237,.15); border:1px solid rgba(124,58,237,.35); color:#e9d5ff; font-size:.8rem; }
+.badge-role { background: rgba(16,185,129,.15); border-color: rgba(16,185,129,.35); color:#bbf7d0; }
+
+/* Tabla estética extra */
+.admin-table tbody tr:nth-child(odd) { background: rgba(255,255,255,.02); }
+.admin-table tbody tr:hover { background: rgba(124,58,237,.15); }
+
+/* Organización de títulos y subtítulos */
+.header-title { display:flex; flex-direction:column; gap:.25rem; }
+.card-subtitle { display:flex; align-items:center; gap:.5rem; color:#cfc7ff; font-size:.98rem; }
+.subtitle-icons { display:flex; align-items:center; gap:.35rem; color:#bfaaff; }
+.subtitle-icons svg { width:16px; height:16px; opacity:.95; }
+
+/* Modal de edición */
+.admin-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.7); display:flex; align-items:center; justify-content:center; z-index: 2000; }
+.admin-modal { width: min(640px, 92vw); background: #0b0b0b; border: 1px solid rgba(124,58,237,.45); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.6); }
+.admin-modal-header { display:flex; align-items:center; justify-content:space-between; padding: .9rem 1rem; border-bottom: 1px solid rgba(255,255,255,.08); }
+.admin-modal-header h4 { margin:0; font-size: 1.2rem; }
+.modal-close { background: transparent; color:#fff; border: none; cursor: pointer; font-size: 1.1rem; }
+.admin-modal-body { padding: 1rem; display:grid; gap:.75rem; }
+.modal-grid { display:grid; grid-template-columns: 1fr 1fr 1fr; gap: .75rem; }
+.modal-form-row { display:flex; flex-direction:column; gap:.25rem; }
+.modal-form-row label { color:#bbb; }
+.modal-form-row input, .modal-form-row select { background: rgba(0,0,0,.4); border:1px solid rgba(124,58,237,.35); color:#fff; border-radius:.5rem; padding:.5rem .6rem; height: 40px; }
+.admin-modal-actions { display:flex; justify-content:flex-end; gap:.5rem; padding: .9rem 1rem; border-top: 1px solid rgba(255,255,255,.08); }
+
+/* Títulos interiores más grandes */
+.admin-card-header h3 { font-size: 1.5rem; }
+.card-subtitle { font-size: 1.05rem; }
+
 @media (max-width: 920px){
   .admin-row { grid-template-columns: 1fr; }
   .admin-form { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px){
+  .admin-container { padding-top: 128px; }
+  .admin-header h2 { font-size: 1.9rem; }
 }

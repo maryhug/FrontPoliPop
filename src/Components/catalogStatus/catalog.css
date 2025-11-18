@@ -8,15 +8,53 @@
     background-repeat: no-repeat;
     background-attachment: fixed;
     min-height: 100vh;
+    padding-top: 96px;
+}
+
+@media (max-width: 768px){
+    .catalog-container {
+        padding-top: 128px;
+    }
+}
+
+.catalog-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    margin-bottom: 1rem;
+    align-items: center;
 }
 
 .catalog-title {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
     color: #fff;
-    font-size: 2.5rem;
-    margin-bottom: 2rem;
+    margin: 0;
+    font-size: 2rem;
+    justify-content: center;
     text-align: center;
-    padding: 6rem 1rem 0 1rem;
-    font-weight: 700;
+    font-weight: 800;
+    letter-spacing: .2px;
+}
+
+.catalog-title-icon {
+    color: #e9d5ff;
+    display: inline-flex;
+    align-items: center;
+}
+
+.catalog-title-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.catalog-sub {
+    margin-left: .5rem;
+    color: #bfaaff;
+    font-size: 1rem;
 }
 
 .movies-horizontal {
@@ -281,35 +319,81 @@
     padding: 0.5rem 2rem;
 }
 
-@media (max-width: 768px) {
-    .catalog-title {
-        font-size: 2rem;
-        padding: 1rem 0.5rem 0 0.5rem;
-    }
+/* Centrar título y contenedor */
+.catalog-header { align-items: center; }
+.catalog-title { justify-content: center; text-align:center; font-size: 2rem; font-weight: 800; letter-spacing: .2px; }
 
-    .movies-horizontal {
-        padding: 1rem;
-    }
+/* Barra de búsqueda mejorada */
+.catalog-search { justify-content: center; gap: .6rem; }
+.search-wrap { position: relative; display:flex; align-items:center; }
+.search-icon { position:absolute; left:12px; color:#7c3aed; display:flex; align-items:center; }
+.search-input {
+  height: 44px;
+  min-width: 360px;
+  padding: 0 1rem 0 40px;
+  background: #fff;
+  color: #111;
+  border: 1px solid rgba(124,58,237,.35);
+  border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(124,58,237,.15);
+}
+.search-input::placeholder { color:#666; }
+.search-input:focus { outline:none; border-color: rgba(124,58,237,.9); box-shadow: 0 0 0 3px rgba(124,58,237,.25); }
 
-    .movie-card {
-        min-width: 250px;
-    }
+/* Acciones dentro del cajón */
+.search-wrap { position: relative; display:flex; align-items:center; }
+.search-actions { position:absolute; right:6px; display:flex; align-items:center; gap:.4rem; }
+.search-input { padding-right: 160px; }
 
-    .movie-image-container {
-        height: 350px;
-    }
+/* Botones pequeños dentro del campo */
+.search-btn { height: 36px; padding: 0 .8rem; border-radius: 999px; font-size:.9rem; }
+.clear-btn { height: 36px; padding: 0 .75rem; border-radius: 999px; font-size:.9rem; }
 
-    .poster-grid {
-        padding: 0 1rem 1rem 1rem;
-    }
+/* Botones: estilo morado como en admin */
+.search-btn {
+  height: 44px;
+  border: none;
+  border-radius: 999px;
+  padding: 0 1rem;
+  background: linear-gradient(90deg,#7c3aed,#6d28d9);
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(124,58,237,.35);
+  cursor: pointer;
+}
+.search-btn:hover { filter: brightness(1.05); }
 
-    .modal-content {
-        grid-template-columns: 1fr;
-        max-width: 94vw;
-        min-height: unset;
-    }
+.clear-btn {
+  height: 44px;
+  border-radius: 999px;
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.35);
+  padding: 0 .9rem;
+}
+.clear-btn:disabled { opacity:.6; cursor:not-allowed; }
 
-    .modal-image-col {
-        max-height: 48vh;
-    }
+/* Botón Limpiar negro */
+.clear-btn {
+  background: #000 !important;
+  color: #fff !important;
+  border: 1px solid rgba(0,0,0,.9) !important;
+}
+.clear-btn:hover { filter: brightness(1.1); }
+
+/* Subtítulo de sección en blanco con icono */
+.section-title {
+  color:#fff;
+  font-size:1.25rem;
+  font-weight: 700;
+  margin: .25rem 2rem .5rem 2rem;
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+}
+.section-title-icon { display:inline-flex; align-items:center; }
+.section-title-icon svg { width:18px; height:18px; color: #fb923c; /* naranja fueguito */ }
+
+@media (max-width: 640px){
+  .catalog-title { font-size: 1.7rem; }
+  .search-input { min-width: 0; width: 100%; }
 }

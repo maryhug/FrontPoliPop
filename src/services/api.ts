@@ -11,6 +11,8 @@ export interface AuthResponse {
   id: number;
   email: string;
   username: string;
+  role?: string;
+  gender?: string;
 }
 
 export interface User {
@@ -19,6 +21,8 @@ export interface User {
   username: string;
   passwordHash?: string;
   role?: string;
+  gender?: string;
+  birthdate?: string; // ISO yyyy-mm-dd
 }
 
 export interface UserSave {
