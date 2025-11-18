@@ -1,0 +1,42 @@
+.admin-container { padding: 1.25rem; min-height: 100vh; background: #000; color: #fff; }
+.admin-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+.admin-subtitle { color: #fff; font-size: .95rem; margin-top: .25rem; }
+.admin-actions { display: flex; gap: .5rem; }
+
+/* Botones */
+.btn { background: linear-gradient(90deg,#7c3aed,#6d28d9); color: #fff; border: none; padding: .6rem .9rem; border-radius: .6rem; cursor: pointer; box-shadow: 0 4px 18px rgba(124,58,237,.35); }
+.btn:disabled { opacity:.6; cursor:not-allowed; }
+.btn-outline { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.35); padding: .6rem .9rem; border-radius: .6rem; cursor: pointer; }
+
+/* Fila y cards */
+.admin-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.admin-card { background: rgba(26,26,26,.85); border: 1px solid rgba(124,58,237,.4); border-radius: 12px; padding: 1rem; }
+.admin-card-header { display:flex; align-items:center; gap:.75rem; margin-bottom:.75rem; }
+.spacer { flex: 1; }
+.admin-hint { color:#9ae6b4; font-size: .9rem; margin-bottom:.5rem; }
+
+/* KPIs */
+.admin-kpis { display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: .75rem; }
+.kpi-item { background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.06); border-radius: .6rem; padding: .75rem; }
+.kpi-key { color:#fff; font-size:.85rem; }
+.kpi-val { color:#fff; font-weight:700; font-size:1.1rem; }
+
+/* Formulario búsqueda */
+.admin-form { display:grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.form-row { display:flex; flex-direction:column; gap:.25rem; }
+.form-row label { color:#fff; font-size:.9rem; }
+.form-row input { background: rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.15); color:#fff; border-radius:.5rem; padding:.5rem .6rem; }
+.form-actions { grid-column: 1 / -1; display:flex; gap:.5rem; }
+
+/* Tabla */
+.admin-table-wrapper { overflow:auto; }
+.admin-table { width:100%; border-collapse:collapse; }
+.admin-table th, .admin-table td { border-bottom: 1px solid rgba(124,58,237,.35); padding:.6rem; text-align:left; color:#fff; }
+.admin-table thead th { color:#fff; border-bottom: 2px solid rgba(124,58,237,.6); }
+.admin-loading, .admin-error, .admin-muted { color:#fff; padding:.5rem 0; }
+.admin-error { color:#ff9aa2; }
+
+@media (max-width: 920px){
+  .admin-row { grid-template-columns: 1fr; }
+  .admin-form { grid-template-columns: 1fr; }
+}

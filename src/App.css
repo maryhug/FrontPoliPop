@@ -1,0 +1,163 @@
+/* Reset y configuración base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.logo:hover {
+  filter: drop-shadow(0 0 2em #572364);
+}
+
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #572364);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  border: 1px solid #333333;
+}
+
+.read-the-docs {
+  color: #b3b3b3;
+}
+
+/* ===== Tipografías ===== */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    line-height: 1.6;
+    position: relative;
+
+    background-image: url('/images/backgroundpelipop.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+
+    background-color: #000;
+    color: #fff;
+}
+
+/* Overlay oscuro sobre el background */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Root container */
+#root {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+}
+
+/* Títulos con Cinzel */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 0.5em;
+}
+
+/* Botones */
+button,
+.btn {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 2px 8px rgba(229, 9, 20, 0.3);
+}
+
+button:hover,
+.btn:hover {
+  background-color: #6d2d7a;
+  box-shadow: 0 4px 12px rgba(87, 35, 100, 0.5);
+  transform: translateY(-1px);
+}
+
+button:active,
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(87, 35, 100, 0.3);
+}
+
+/* Cards */
+.card {
+    padding: 2em;
+    background-color: rgba(26, 26, 26, 0.9);
+    border-radius: 8px;
+    border: 1px solid #333333;
+    backdrop-filter: blur(10px);
+}
+
+/* Links */
+.read-the-docs {
+    color: #b3b3b3;
+}
+
+/* Logo animations */
+.logo {
+    height: 6em;
+    padding: 1.5em;
+    will-change: filter;
+    transition: filter 300ms;
+}
+
+.logo:hover {
+    filter: drop-shadow(0 0 2em #646cffaa);
+}
+
+.logo.react:hover {
+    filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    a:nth-of-type(2) .logo {
+        animation: logo-spin infinite 20s linear;
+    }
+}
