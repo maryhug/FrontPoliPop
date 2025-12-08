@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiService, type User } from '../../services/api';
 import './admin.css';
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 
 interface AnalyticsSummaryDTO {
   [key: string]: any;
@@ -105,13 +106,13 @@ const extractTopItems = (v: any): Array<{ label: string; count?: number }> => {
   const items: Array<{ label: string; count?: number }> = [];
   if (!v && v !== 0) return items;
   if (Array.isArray(v)) {
-    for (const i of v) {
+    for (const i of v as any[]) {
       if (i && typeof i === 'object') {
         const label = (i.title || i.originalTitle || i.original_title || i.movieTitle || i.name || i.label || '') as string;
         const count = (i.count || i.value || i.total || i.times || i.freq || i.frequency) as number | undefined;
         if (label) items.push({ label, count });
-      } else if (typeof i === 'string') {
-        items.push({ label: translateMetricLabel(i) });
+      } else if (typeof (i as any) === 'string') {
+        items.push({ label: translateMetricLabel(String(i)) });
       }
     }
   } else if (typeof v === 'object') {
@@ -149,16 +150,16 @@ const AdminDashboard: React.FC = () => {
   const [etlRunning, setEtlRunning] = useState(false);
   const [etlMsg, setEtlMsg] = useState('');
 
-  // Búsqueda de usuarios
-  const [searchId, setSearchId] = useState<string>('');
-  const [searchEmail, setSearchEmail] = useState<string>('');
-  const [searchUsername, setSearchUsername] = useState<string>('');
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [searchError, setSearchError] = useState<string>('');
-  const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [deleteError, setDeleteError] = useState<string>('');
+  // Búsqueda unificada (tabla)
+  const [query, setQuery] = useState<string>('');
+  const [queryLoading, setQueryLoading] = useState(false);
+  const [queryError, setQueryError] = useState<string>('');
+
+  // Selección y eliminación
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [deleteError, setDeleteError] = useState<string>('');
 
   // Edición
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -294,46 +295,61 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const resetSearch = async () => {
-    setSearchId('');
-    setSearchEmail('');
-    setSearchUsername('');
-    setSearchError('');
-    // Volver a cargar todos
+  const reloadAllUsers = async () => {
+    setQuery('');
+    setQueryError('');
     try {
-      setSearchLoading(true);
+      setQueryLoading(true);
       const data = await apiService.getAllUsers();
       setUsers(data || []);
     } catch (e: any) {
-      setSearchError(e?.message || 'No se pudieron recargar los usuarios');
+      setQueryError(e?.message || 'No se pudieron recargar los usuarios');
     } finally {
-      setSearchLoading(false);
+      setQueryLoading(false);
     }
   };
 
-  const searchUsers = async () => {
-    setSearchError('');
-    setSearchLoading(true);
+  const performQuery = async () => {
+    const q = query.trim();
+    setQueryError('');
+    setQueryLoading(true);
     try {
-      if (searchId.trim()) {
-        const u = await apiService.getUserById(Number(searchId));
-        setUsers(u ? [u] : []);
-      } else if (searchEmail.trim()) {
-        const u = await apiService.getUserByEmail(searchEmail.trim());
-        setUsers(u ? [u] : []);
-      } else if (searchUsername.trim()) {
-        const u = await apiService.getUserByUsername(searchUsername.trim());
-        setUsers(u ? [u] : []);
-      } else {
-        // si no hay criterios, recargar todo
+      if (!q) {
         const data = await apiService.getAllUsers();
         setUsers(data || []);
+        return;
+      }
+      const isId = /^\d+$/.test(q);
+      const isEmail = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(q);
+      if (isId) {
+        const u = await apiService.getUserById(Number(q));
+        setUsers(u ? [u] : []);
+        if (!u) setQueryError('No se encontró ningún usuario con ese ID.');
+      } else if (isEmail) {
+        const u = await apiService.getUserByEmail(q);
+        setUsers(u ? [u] : []);
+        if (!u) setQueryError('No se encontró ningún usuario con ese email.');
+      } else {
+        const u = await apiService.getUserByUsername(q);
+        setUsers(u ? [u] : []);
+        if (!u) setQueryError('No se encontró ningún usuario con ese username.');
       }
     } catch (e: any) {
+      const msg = (e && (e.message || String(e))) || '';
+      if (msg.includes('Unexpected end of JSON input') || msg.includes("Failed to execute 'json'") || msg.includes('Unexpected end of input') || e instanceof SyntaxError) {
+        setQueryError('No se encontró ningún usuario. El servidor devolvió una respuesta vacía o no válida (JSON).');
+      } else if (msg.includes('Failed to fetch') || /networkerror/i.test(msg) || /network request failed/i.test(msg) || /TypeError: Failed to fetch/i.test(msg)) {
+        setQueryError('No se pudo conectar al servidor. Verifica tu conexión.');
+      } else if (msg.includes('404') || /not found/i.test(msg)) {
+        setQueryError('No se encontró ningún usuario que coincida.');
+      } else if (/401|unauthorized/i.test(msg)) {
+        setQueryError('No autorizado. Inicia sesión de nuevo.');
+      } else {
+        setQueryError('No se encontró ningún usuario. ' + (msg ? `Detalle técnico: ${msg}` : ''));
+      }
       setUsers([]);
-      setSearchError(e?.message || 'No se encontró el usuario');
     } finally {
-      setSearchLoading(false);
+      setQueryLoading(false);
     }
   };
 
@@ -357,39 +373,147 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
+  const normalizeGenderCode = (raw: string): 'f' | 'm' | 'o' | 'u' => {
+    const k = (raw || '').trim().toUpperCase();
+    if (k === 'F' || k === 'FEMALE' || k === 'FEMENINO') return 'f';
+    if (k === 'M' || k === 'MALE' || k === 'MASCULINO') return 'm';
+    if (k === 'O' || k === 'OTHER' || k === 'OTRO') return 'o';
+    return 'u';
+  };
+
+  const toLabelCountList = (v: any): Array<{ label: string; rawLabel?: string; count: number }> => {
+    const rows: Array<{ label: string; rawLabel?: string; count: number }> = [];
+    if (!v && v !== 0) return rows;
+    if (Array.isArray(v)) {
+      for (const it of v as any[]) {
+        if (!it) continue;
+        if (typeof it === 'object') {
+          const raw = (it.country || it.label || it.name || it.title || it.originalTitle || it.original_title || it.key || '') as string;
+          const cnt = (it.count ?? it.value ?? it.total ?? it.times ?? it.freq ?? it.frequency) as number | undefined;
+          if (raw && typeof cnt === 'number') rows.push({ label: String(raw), rawLabel: String(raw), count: cnt });
+        } else if (typeof it === 'string') {
+          rows.push({ label: it, rawLabel: it, count: 1 });
+        }
+      }
+      return rows;
+    }
+    if (typeof v === 'object') {
+      for (const [k, val] of Object.entries(v as Record<string, any>)) {
+        if (val && typeof val === 'object') {
+          const cnt = (val as any).count as number | undefined;
+          if (typeof cnt === 'number') rows.push({ label: k, rawLabel: k, count: cnt });
+        } else if (typeof val === 'number') {
+          rows.push({ label: k, rawLabel: k, count: val });
+        }
+      }
+      return rows;
+    }
+    return rows;
+  };
+
   const renderSummary = () => {
     if (loadingSummary) return <div className="admin-loading">Cargando resumen…</div>;
     if (summaryError) return <div className="admin-error">{summaryError}</div>;
     if (!summary || Object.keys(summary).length === 0) return <div className="admin-muted">Sin datos de resumen</div>;
+
+    // Preparar datasets para gráficas
+    const genderRows = toLabelCountList((summary as any).byGender);
+    const genderTotal = genderRows.reduce((acc, r) => acc + (r.count || 0), 0);
+    const genderData = genderRows
+      .map((r) => ({ code: normalizeGenderCode(r.rawLabel || r.label), label: translateMetricLabel(r.label), value: r.count }))
+      .filter((d) => d.value > 0)
+      .sort((a, b) => {
+        const order: Record<string, number> = { m: 0, f: 1, o: 2, u: 3 };
+        return (order[a.code] ?? 99) - (order[b.code] ?? 99);
+      });
+    const genderColors: Record<'m'|'f'|'o'|'u', string> = { m: '#0ea5e9', f: '#db2777', o: '#7c3aed', u: '#64748b' };
+
+    const countryRows = toLabelCountList((summary as any).byCountry);
+    const countryTotal = countryRows.reduce((acc, r) => acc + (r.count || 0), 0);
+    const countryData = countryRows
+      .map((r) => ({ label: r.label, value: r.count, pct: countryTotal > 0 ? Math.round((r.count / countryTotal) * 100) : 0 }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 10);
+    const countryColors = ['#a78bfa','#60a5fa','#34d399','#f59e0b','#f472b6','#c084fc','#93c5fd','#86efac','#fde047','#fda4af'];
+
     const entries = Object.entries(summary);
     const wideKeys = new Set(['topFavoriteMovies', 'favoriteMovies', 'topFavorites']);
+
     return (
-      <div className="admin-kpis">
-        {entries.map(([k, v]) => {
-          if (wideKeys.has(k)) {
-            const items = extractTopItems(v);
-            return (
-              <div key={k} className="kpi-item kpi-item--wide">
-                <div className="kpi-key">{translateKey(k)}</div>
-                {items.length ? (
-                  <div className="kpi-list">
-                    {items.map((it, idx) => (
-                      <span key={idx} className="kpi-pill">{it.label}{typeof it.count === 'number' ? ` (${it.count})` : ''}</span>
+      <div>
+        {/* Grid de gráficas principales */}
+        <div className="analytics-grid">
+          <div className="kpi-item analytics-item">
+            <div className="kpi-key">Distribución por género {genderTotal ? `(${genderTotal.toLocaleString()})` : ''}</div>
+            <div className="chart-box">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
+                  <Pie data={genderData} dataKey="value" nameKey="label" innerRadius={60} outerRadius={92} paddingAngle={2}>
+                    {genderData.map((d, idx) => (
+                      <Cell key={`g-${idx}`} fill={genderColors[d.code]} />
                     ))}
-                  </div>
-                ) : (
-                  <div className="kpi-val">Sin datos</div>
-                )}
+                  </Pie>
+                  <Tooltip formatter={(val: any, name: any) => {
+                    const v = Number(val) || 0;
+                    const pct = genderTotal ? Math.round((v / genderTotal) * 100) : 0;
+                    return [`${v.toLocaleString()} (${pct}%)`, name];
+                  }} />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+          <div className="kpi-item analytics-item">
+            <div className="kpi-key">Países con más usuarios {countryTotal ? `(${countryTotal.toLocaleString()})` : ''}</div>
+            <div className="chart-box">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
+                  <Pie data={countryData} dataKey="value" nameKey="label" innerRadius={58} outerRadius={94} paddingAngle={1}>
+                    {countryData.map((_, idx) => (
+                      <Cell key={`c-${idx}`} fill={countryColors[idx % countryColors.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(val: any, name: any, p: any) => {
+                    const v = Number(val) || 0;
+                    const pct = p && p.payload ? p.payload.pct : 0;
+                    return [`${v.toLocaleString()} (${pct}%)`, name];
+                  }} />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        {/* KPIs restantes (excluye byGender/byCountry para no duplicar) */}
+        <div className="admin-kpis">
+          {entries.map(([k, v]) => {
+            if (k === 'byGender' || k === 'byCountry') return null;
+            if (wideKeys.has(k)) {
+              const items = extractTopItems(v);
+              return (
+                <div key={k} className="kpi-item kpi-item--wide">
+                  <div className="kpi-key">{translateKey(k)}</div>
+                  {items.length ? (
+                    <div className="kpi-list">
+                      {items.map((it, idx) => (
+                        <span key={idx} className="kpi-pill">{it.label}{typeof it.count === 'number' ? ` (${it.count})` : ''}</span>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="kpi-val">Sin datos</div>
+                  )}
+                </div>
+              );
+            }
+            return (
+              <div key={k} className="kpi-item">
+                <div className="kpi-key">{translateKey(k)}</div>
+                <div className="kpi-val">{formatMetricValue(v)}</div>
               </div>
             );
-          }
-          return (
-            <div key={k} className="kpi-item">
-              <div className="kpi-key">{translateKey(k)}</div>
-              <div className="kpi-val">{formatMetricValue(v)}</div>
-            </div>
-          );
-        })}
+          })}
+        </div>
       </div>
     );
   };
@@ -437,8 +561,8 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Fila de tarjetas: Resumen y Acciones */}
-      <div className="admin-row">
+      {/* Sección de Analíticas (arriba, full width) */}
+      <div className="admin-row admin-row--full">
         <div className="admin-card">
           <div className="admin-card-header">
             <h3>Resumen de Analíticas</h3>
@@ -450,69 +574,48 @@ const AdminDashboard: React.FC = () => {
           {etlMsg && <div className="admin-hint">{etlMsg}</div>}
           {renderSummary()}
         </div>
-
-        <div className="admin-card">
-          <div className="admin-card-header">
-            <div className="header-title">
-              <h3>Buscar usuarios</h3>
-              <div className="card-subtitle">
-                <span className="subtitle-icons" aria-hidden="true">
-                  {/* ID */}
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.9 12l4.6 4.6 1.4-1.4-4.6-4.6A7 7 0 0 0 10 3Zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z"/></svg>
-                  {/* Email */}
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm0 2v.01L12 12l8-5.99V6H4Zm16 12V9.24l-7.37 5.52a2 2 0 0 1-2.26 0L3 9.24V18h17Z"/></svg>
-                  {/* Username */}
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.33 0-8 2.17-8 5v1h16v-1c0-2.83-3.67-5-8-5Z"/></svg>
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="admin-form">
-            <div className="form-row">
-              <label htmlFor="uid">ID</label>
-              <div className="input-wrap">
-                <span className="input-icon" aria-hidden="true">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.9 12l4.6 4.6 1.4-1.4-4.6-4.6A7 7 0 0 0 10 3Zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z"/></svg>
-                </span>
-                <input id="uid" type="number" value={searchId} onChange={(e) => setSearchId(e.target.value)} placeholder="Ej: 12" />
-              </div>
-            </div>
-            <div className="form-row">
-              <label htmlFor="uemail">Email</label>
-              <div className="input-wrap">
-                <span className="input-icon" aria-hidden="true">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm0 2v.01L12 12l8-5.99V6H4Zm16 12V9.24l-7.37 5.52a2 2 0 0 1-2.26 0L3 9.24V18h17Z"/></svg>
-                </span>
-                <input id="uemail" type="email" value={searchEmail} onChange={(e) => setSearchEmail(e.target.value)} placeholder="usuario@correo.com" />
-              </div>
-            </div>
-            <div className="form-row">
-              <label htmlFor="uname">Username</label>
-              <div className="input-wrap">
-                <span className="input-icon" aria-hidden="true">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.33 0-8 2.17-8 5v1h16v-1c0-2.83-3.67-5-8-5Z"/></svg>
-                </span>
-                <input id="uname" type="text" value={searchUsername} onChange={(e) => setSearchUsername(e.target.value)} placeholder="usuario" />
-              </div>
-            </div>
-            <div className="form-actions">
-              <button className="btn" onClick={searchUsers} disabled={searchLoading}>{searchLoading ? 'Buscando…' : 'Buscar'}</button>
-              <button className="btn-outline" onClick={resetSearch} disabled={searchLoading}>Limpiar</button>
-            </div>
-            {searchError && <div className="admin-error" style={{marginTop: '.5rem'}}>{searchError}</div>}
-          </div>
-        </div>
       </div>
 
-      {/* Lista de usuarios */}
+      {/* Sección de Usuarios (abajo, full width) */}
       <div className="admin-card">
         <div className="admin-card-header">
           <h3>Usuarios ({users.length})</h3>
           <div className="spacer" />
-          <button className="btn-danger" onClick={bulkDelete} disabled={bulkDeleting || selectedIds.size === 0} title="Eliminar seleccionados" aria-label="Eliminar seleccionados">
-            Eliminar seleccionados ({selectedIds.size})
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              className="btn-icon"
+              onClick={bulkDelete}
+              disabled={bulkDeleting || selectedIds.size === 0}
+              title={selectedIds.size > 0 ? `Eliminar ${selectedIds.size} seleccionados` : 'Eliminar seleccionados'}
+              aria-label="Eliminar seleccionados"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                <path d="M9 3a1 1 0 0 0-1 1v1H5.5a1 1 0 1 0 0 2H6v12a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V7h.5a1 1 0 1 0 0-2H16V4a1 1 0 0 0-1-1H9Zm1 2h4v1h-4V5Z" />
+              </svg>
+            </button>
+            {selectedIds.size > 0 && <span className="bulk-count" aria-hidden>{selectedIds.size}</span>}
+          </div>
         </div>
+
+        {/* Barra de búsqueda compacta */}
+        <div className="admin-table-toolbar">
+          <div className="input-wrap toolbar-input">
+            <span className="input-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.9 12l4.6 4.6 1.4-1.4-4.6-4.6A7 7 0 0 0 10 3Zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z"/></svg>
+            </span>
+            <input
+              type="text"
+              placeholder="Buscar por ID, email o username"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') performQuery(); }}
+            />
+          </div>
+          <button className="btn" onClick={performQuery} disabled={queryLoading}>{queryLoading ? 'Buscando…' : 'Buscar'}</button>
+          <button className="btn-outline" onClick={reloadAllUsers} disabled={queryLoading}>Limpiar</button>
+        </div>
+        {queryError && <div className="admin-error" style={{ marginTop: '.5rem' }}>{queryError}</div>}
+
         {loadingUsers ? (
           <div className="admin-loading">Cargando usuarios…</div>
         ) : usersError ? (
@@ -546,7 +649,7 @@ const AdminDashboard: React.FC = () => {
                     <td>{(() => { const a = computeAge(u.birthdate); return a !== undefined ? a : '—'; })()}</td>
                     <td>
                       <button
-                        className="btn-outline"
+                        className="btn-icon"
                         onClick={() => openEdit(u)}
                         title="Editar usuario"
                         aria-label="Editar usuario"
@@ -577,6 +680,7 @@ const AdminDashboard: React.FC = () => {
           </div>
         )}
       </div>
+      {/* Fin split */}
       {editingId !== null && (
         <div className="admin-modal-backdrop" onClick={closeEdit}>
           <div className="admin-modal" onClick={(e) => e.stopPropagation()}>

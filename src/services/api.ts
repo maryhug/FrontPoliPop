@@ -53,6 +53,31 @@ export interface TMDBmovieDTO {
   genres?: Array<{ id: number; name: string }>;
 }
 
+// --- Nuevo helper: normalizar objetos película que vienen del backend/TMDB ---
+function normalizeMovieObj(m: any): TMDBmovieDTO {
+  if (!m) return {} as TMDBmovieDTO;
+  const id = m.id ?? m.movieId ?? m.tmdbId;
+  const title = m.title || m.name || m.original_title || m.originalTitle;
+  const originalTitle = m.original_title || m.originalTitle || m.originalName;
+  const overview = m.overview || m.description || m.tagline;
+  const posterPath = m.poster_path || m.posterPath || m.poster || m.posterUrl || m.image;
+  const backdropPath = m.backdrop_path || m.backdropPath || m.backdrop || undefined;
+  const releaseDate = m.release_date || m.releaseDate || m.year || undefined;
+  const voteAverage = typeof m.vote_average === 'number' ? m.vote_average : (typeof m.voteAverage === 'number' ? m.voteAverage : undefined);
+  const genres = m.genres || m.genre_names || m.genreIds || [];
+  return {
+    id,
+    title,
+    originalTitle,
+    overview,
+    posterPath,
+    backdropPath,
+    releaseDate,
+    voteAverage,
+    genres,
+  } as TMDBmovieDTO;
+}
+
 class ApiService {
   private baseUrl: string;
 
@@ -199,8 +224,8 @@ class ApiService {
     }
   }
 
-  // Ejemplo: Buscar películas (usa el endpoint del backend)
-  async searchMovies(query: string): Promise<any[]> {
+  // Ejemplo: Buscar películas (usa el endpoint del backend) - ahora normalizamos la respuesta
+  async searchMovies(query: string): Promise<TMDBmovieDTO[]> {
     if (!query || query.trim().length === 0) return [];
     const q = encodeURIComponent(query.trim());
     const url = `${this.baseUrl}/movies/search?query=${q}`;
@@ -212,11 +237,13 @@ class ApiService {
       const text = await res.text().catch(() => '');
       throw new Error(`Error buscando películas: ${res.status} ${text}`);
     }
-    return res.json();
+    const data = await res.json().catch(() => []);
+    if (!Array.isArray(data)) return [];
+    return data.map(normalizeMovieObj);
   }
 
-  // Obtener detalles de película por id
-  async getMovieDetails(id: number): Promise<any> {
+  // Obtener detalles de película por id (normalizado)
+  async getMovieDetails(id: number): Promise<TMDBmovieDTO> {
     const url = `${this.baseUrl}/movies/details/${id}`;
     const res = await fetch(url, {
       method: 'GET',
@@ -226,7 +253,8 @@ class ApiService {
       const text = await res.text().catch(() => '');
       throw new Error(`Error obteniendo detalles de la película: ${res.status} ${text}`);
     }
-    return res.json();
+    const raw = await res.json().catch(() => ({}));
+    return normalizeMovieObj(raw);
   }
 
   // POPULARES
@@ -237,7 +265,9 @@ class ApiService {
       const text = await res.text().catch(() => '');
       throw new Error(`Error cargando populares: ${res.status} ${text}`);
     }
-    return res.json();
+    const data = await res.json().catch(() => []);
+    if (!Array.isArray(data)) return [];
+    return data.map(normalizeMovieObj);
   }
 
   // ANALYTICS
@@ -258,6 +288,27 @@ class ApiService {
     if (!res.ok) {
       const text = await res.text().catch(() => '');
       throw new Error(`Error al obtener summary: ${res.status} ${text}`);
+    }
+    return res.json();
+  }
+
+  // Nuevos endpoints: countries y genders
+  async getCountries(): Promise<any[]> {
+    const url = `${this.baseUrl}/countries`;
+    const res = await fetch(url, { method: 'GET', headers: this.getAuthHeaders() });
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      throw new Error(`Error cargando países: ${res.status} ${text}`);
+    }
+    return res.json();
+  }
+
+  async getGenders(): Promise<string[]> {
+    const url = `${this.baseUrl}/genders`;
+    const res = await fetch(url, { method: 'GET', headers: this.getAuthHeaders() });
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      throw new Error(`Error cargando géneros: ${res.status} ${text}`);
     }
     return res.json();
   }
