@@ -6,6 +6,7 @@ import RegisterInicial from "./Components/register.tsx";
 import TopNavBar from './Components/common/TopNavbar.tsx'; // Ajusta la ruta según tu estructura
 import AdminDashboard from './Components/admin/AdminDashboard.tsx';
 import { isAdmin } from './services/auth';
+import SectionUnavailable from './Components/common/SectionUnavailable.tsx';
 
 const AppContent: React.FC = () => {
     const location = useLocation();
@@ -34,6 +35,14 @@ const AppContent: React.FC = () => {
                 <Route
                     path="/admin"
                     element={isAdmin() ? <AdminDashboard /> : <Navigate to="/home" replace />}
+                />
+                <Route
+                    path="/novedades"
+                    element={<SectionUnavailable title="Novedades" description="Aún no hay novedades disponibles." />}
+                />
+                <Route
+                    path="/mi-lista"
+                    element={<SectionUnavailable title="Mi Lista" description="Tu lista personalizada estará disponible pronto." />}
                 />
                 <Route
                     path="/"

@@ -48,6 +48,7 @@ const Catalog: React.FC = () => {
    const [error, setError] = useState('');
 
    const [open, setOpen] = useState(false);
+   const [isClosing, setIsClosing] = useState(false);
    const [details, setDetails] = useState<TMDBmovieDTO | null>(null);
    const [loadingDetails, setLoadingDetails] = useState(false);
    const [selectedCard, setSelectedCard] = useState<CardMovie | null>(null);
@@ -123,6 +124,7 @@ const Catalog: React.FC = () => {
     const card = list.find((x) => x.id === id) || null;
     setSelectedCard(card);
     setOpen(true);
+    setIsClosing(false);
     setDetails(null);
     setLoadingDetails(true);
     try {
@@ -134,6 +136,16 @@ const Catalog: React.FC = () => {
     } finally {
       setLoadingDetails(false);
     }
+  };
+
+  const closeModal = () => {
+    // activar animación de salida
+    setIsClosing(true);
+    // esperar a que termine la animación y cerrar
+    setTimeout(() => {
+      setOpen(false);
+      setIsClosing(false);
+    }, 220);
   };
 
   // opciones de filtro: años disponibles
@@ -212,12 +224,18 @@ const Catalog: React.FC = () => {
        ) : (
          <div className="poster-grid">
            {filteredList.map((m) => (
-             <div key={m.id} className="poster-card" onClick={() => openModal(m.id)}>
+             <div key={m.id} className="poster-card" onClick={() => openModal(m.id)} aria-label={`Ver detalles de ${m.title}`}>
+               {/* Badges posicionados */}
+               {m.rating !== undefined && (
+                 <span className="badge-rating" aria-hidden>⭐ {m.rating.toFixed(1)}</span>
+               )}
+               {m.year && (
+                 <span className="badge-year" aria-hidden>{m.year}</span>
+               )}
                <img className="poster-img" src={m.poster} alt={m.title} onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/logo.png'; }} />
                <div className="poster-title">{m.title}</div>
                <div className="poster-sub">
-                 {m.rating !== undefined && <span className="poster-rating">⭐ {m.rating.toFixed(1)}</span>}
-                 {m.year && <span className="poster-year">{m.year}</span>}
+                 {/* Se eliminaron rating y año para no duplicar la información mostrada en badges */}
                </div>
              </div>
            ))}
@@ -225,9 +243,9 @@ const Catalog: React.FC = () => {
        )}
 
        {open && (
-         <div className="modal-backdrop" onClick={() => setOpen(false)}>
-           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-             <button className="modal-close" onClick={() => setOpen(false)} aria-label="Cerrar">✕</button>
+         <div className={"modal-backdrop" + (isClosing ? " closing" : "")} onClick={closeModal}>
+           <div className={"modal-content" + (isClosing ? " closing" : "")} onClick={(e) => e.stopPropagation()}>
+             <button className="modal-close" onClick={closeModal} aria-label="Cerrar">✕</button>
              {loadingDetails ? (
                <div className="loading" style={{ padding: '1rem' }}>Cargando detalles…</div>
              ) : details || selectedCard ? (
