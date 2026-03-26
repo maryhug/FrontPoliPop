@@ -1,187 +1,157 @@
-@custom-variant dark (&:is(.dark *));
+/* ─────────────────────────────────────────────────────────────────────────
+   REGISTER VALIDATION STYLES — añade esto al final de login.css
+   ───────────────────────────────────────────────────────────────────────── */
 
-:root {
-  --font-size: 16px;
-  --background: #141414;
-  --foreground: #ffffff;
-  --card: #1a1a1a;
-  --card-foreground: #e5e5e5;
-  --popover: #1a1a1a;
-  --popover-foreground: #ffffff;
-  --primary: #e50914;
-  --primary-foreground: #ffffff;
-  --secondary: #221f1f;
-  --secondary-foreground: #e5e5e5;
-  --muted: #b3b3b3;
-  --muted-foreground: #ffffff;
-  --accent: #e50914;
-  --accent-foreground: #ffffff;
-  --destructive: #d4183d;
-  --destructive-foreground: #ffffff;
-  --border: #333333;
-  --input: #1f1f1f;
-  --input-background: #141414;
-  --switch-background: #333333;
-  --font-weight-medium: 500;
-  --font-weight-normal: 400;
-  --ring: #e50914;
-  --chart-1: #e50914;
-  --chart-2: #b3b3b3;
-  --chart-3: #ffffff;
-  --chart-4: #141414;
-  --chart-5: #e50914;
-  --radius: 0.625rem;
-  --sidebar: #000000;
-  --sidebar-foreground: #ffffff;
-  --sidebar-primary: #e50914;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1f1f1f;
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #333333;
-  --sidebar-ring: #e50914;
+/* ── Field wrapper ── */
+.reg-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
-.dark {
-  --background: #000000;
-  --foreground: #ffffff;
-  --card: #141414;
-  --card-foreground: #ffffff;
-  --popover: #141414;
-  --popover-foreground: #ffffff;
-  --primary: #e50914;
-  --primary-foreground: #ffffff;
-  --secondary: #1f1f1f;
-  --secondary-foreground: #ffffff;
-  --muted: #b3b3b3;
-  --muted-foreground: #ffffff;
-  --accent: #f40612;
-  --accent-foreground: #ffffff;
-  --destructive: #d4183d;
-  --destructive-foreground: #ffffff;
-  --border: #333333;
-  --input: #1a1a1a;
-  --ring: #e50914;
-  --chart-1: #e50914;
-  --chart-2: #b3b3b3;
-  --chart-3: #ffffff;
-  --chart-4: #141414;
-  --chart-5: #f40612;
-  --sidebar: #000000;
-  --sidebar-foreground: #ffffff;
-  --sidebar-primary: #e50914;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1f1f1f;
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #333333;
-  --sidebar-ring: #e50914;
+/* ── Input wrapper (icon + input + check) ── */
+.reg-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-input-background: var(--input-background);
-  --color-switch-background: var(--switch-background);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+/* ── Leading icon ── */
+.reg-icon {
+    position: absolute;
+    left: 12px;
+    display: flex;
+    align-items: center;
+    color: #737373;
+    pointer-events: none;
+    z-index: 1;
+    transition: color 0.2s;
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-
-body {
-  font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
+.reg-input-wrap:focus-within .reg-icon {
+    color: #a855f7;
 }
 
-/**
- * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
- */
-@layer base {
-  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
-    h1 {
-      font-size: var(--text-2xl);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
-    }
-
-    h2 {
-      font-size: var(--text-xl);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
-    }
-
-    h3 {
-      font-size: var(--text-lg);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
-    }
-
-    h4 {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
-    }
-
-    p {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-normal);
-      line-height: 1.5;
-    }
-
-    label {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
-    }
-
-    button {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
-    }
-
-    input {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-normal);
-      line-height: 1.5;
-    }
-  }
+/* ── Base input ── */
+.reg-input {
+    width: 100%;
+    padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+    background: rgba(23, 23, 23, 0.5);
+    border: 1px solid rgba(64, 64, 64, 0.5);
+    border-radius: 0.75rem;
+    color: #fff;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
-html {
-  font-size: var(--font-size);
+.reg-input::placeholder { color: #737373; }
+
+.reg-input:focus {
+    border-color: rgba(147, 51, 234, 0.5);
+    background: rgba(23, 23, 23, 0.7);
+    box-shadow: 0 0 15px rgba(87, 35, 100, 0.2);
+}
+
+.reg-input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Password extra padding for eye button */
+.reg-input--pw { padding-right: 2.75rem; }
+
+/* Select */
+.reg-select { cursor: pointer; padding-right: 2.5rem; }
+.reg-select option { background: #1a0a2e; color: #fff; }
+
+.reg-select-arrow {
+    position: absolute;
+    right: 10px;
+    color: #737373;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+}
+
+/* Eye button */
+.reg-eye {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #737373;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    transition: color 0.2s;
+    z-index: 2;
+}
+.reg-eye:hover { color: #a855f7; }
+
+/* ── Check mark ── */
+.reg-check {
+    position: absolute;
+    right: 10px;
+    color: #22c55e;
+    font-size: 0.85rem;
+    font-weight: 700;
+    pointer-events: none;
+}
+
+/* ── Error message ── */
+.reg-error-msg {
+    font-size: 0.72rem;
+    color: #fca5a5;
+    padding-left: 2px;
+    animation: regErrPop 0.2s ease-out;
+}
+
+@keyframes regErrPop {
+    from { opacity: 0; transform: translateY(-3px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Field states ── */
+.reg-field--error .reg-input {
+    border-color: rgba(220, 38, 38, 0.6);
+    background: rgba(220, 38, 38, 0.05);
+}
+.reg-field--error .reg-input:focus {
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+.reg-field--error .reg-icon { color: #f87171; }
+
+.reg-field--ok .reg-input {
+    border-color: rgba(34, 197, 94, 0.45);
+}
+.reg-field--ok .reg-icon { color: #22c55e; }
+
+/* ── Password strength ── */
+.reg-strength {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+}
+
+.reg-strength-bars {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+}
+
+.reg-strength-bar {
+    height: 3px;
+    flex: 1;
+    border-radius: 99px;
+    transition: background 0.3s ease;
+}
+
+.reg-strength-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: color 0.3s ease;
 }

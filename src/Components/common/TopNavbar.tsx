@@ -7,37 +7,16 @@ const TopNavbar: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const rawUser = localStorage.getItem('user');
-    let profileInitial = 'U';
-    if (rawUser) {
-        try {
-            const parsed = JSON.parse(rawUser) as { username?: string; email?: string };
-            const source = parsed.username || parsed.email || 'Usuario';
-            const trimmed = source.trim();
-            if (trimmed.length > 0) {
-                profileInitial = trimmed.charAt(0).toUpperCase();
-            }
-        } catch {
-            // Si falla el parseo se usa inicial por defecto.
-        }
-    }
-
     // Rutas donde ocultar la navbar
     const hideNavbarPaths = ['/register', '/login'];
 
-    // Si la ruta actual coincide o empieza con alguna ruta a ocultar, no renderizar navbar
     if (hideNavbarPaths.some(path => location.pathname.startsWith(path))) {
         return null;
     }
 
     const handleLogout = (): void => {
-        // Limpiar datos de sesión
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-
-        console.log('Cerrando sesión...');
-
-        // Redirigir al login
         navigate('/login');
     };
 
@@ -52,30 +31,24 @@ const TopNavbar: React.FC = () => {
                 {/* Navigation Links */}
                 <ul className="navbar-menu">
                     <li className="navbar-item">
-                        <Link to="/explorar" className="navbar-link">
-                            Explorar
-                        </Link>
+                        <Link to="/explorar" className="navbar-link">Explorar</Link>
                     </li>
                     <li className="navbar-item">
-                        <Link to="/novedades" className="navbar-link">
-                            Novedades
-                        </Link>
+                        <Link to="/novedades" className="navbar-link">Novedades</Link>
                     </li>
                     <li className="navbar-item">
-                        <Link to="/mi-lista" className="navbar-link">
-                            Mi Lista
-                        </Link>
+                        <Link to="/mi-lista" className="navbar-link">Mi Lista</Link>
                     </li>
                     {isAdmin() && (
-                      <li className="navbar-item">
-                          <Link to="/admin" className="navbar-link admin-link" title="Panel de Administración">
-                              <span>Admin</span>
-                          </Link>
-                      </li>
+                        <li className="navbar-item">
+                            <Link to="/admin" className="navbar-link admin-link" title="Panel de Administración">
+                                <span>Admin</span>
+                            </Link>
+                        </li>
                     )}
                 </ul>
 
-                {/* Logout Icon */}
+                {/* Actions */}
                 <div className="navbar-actions">
                     <button
                         onClick={() => navigate('/perfil')}
@@ -83,7 +56,10 @@ const TopNavbar: React.FC = () => {
                         title="Mi perfil"
                         aria-label="Mi perfil"
                     >
-                        {profileInitial}
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="8" r="4" />
+                            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+                        </svg>
                     </button>
                     <button onClick={handleLogout} className="logout-button" title="Cerrar sesión">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
