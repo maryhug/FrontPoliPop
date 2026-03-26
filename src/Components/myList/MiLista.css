@@ -1,0 +1,109 @@
+.my-list-container {
+  min-height: 100vh;
+  padding: 100px 2rem 2rem;
+  background-color: #0b0b0b;
+  color: #fff;
+}
+
+.my-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.my-list-header h2 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.my-list-refresh-btn,
+.my-list-home-btn,
+.my-list-remove-btn {
+  border: 1px solid rgba(124, 58, 237, 0.4);
+  background: rgba(124, 58, 237, 0.2);
+  color: #fff;
+  border-radius: 10px;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.my-list-refresh-btn:hover,
+.my-list-home-btn:hover,
+.my-list-remove-btn:hover {
+  background: rgba(124, 58, 237, 0.45);
+}
+
+.my-list-refresh-btn:disabled,
+.my-list-remove-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.my-list-loading,
+.my-list-error,
+.my-list-empty {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 10px;
+  background: rgba(20, 20, 20, 0.8);
+}
+
+.my-list-error {
+  color: #ff9aa2;
+}
+
+.my-list-empty p {
+  margin: 0 0 0.8rem;
+}
+
+.my-list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 1rem;
+}
+
+.my-list-card {
+  background: linear-gradient(180deg, rgba(11, 8, 18, 0.85), rgba(11, 8, 18, 0.55));
+  border: 1px solid rgba(124, 58, 237, 0.28);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.my-list-poster {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  display: block;
+}
+
+.my-list-card-body {
+  padding: 0.8rem;
+}
+
+.my-list-card-body h3 {
+  margin: 0;
+  font-size: 0.96rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.my-list-card-body p {
+  margin: 0.5rem 0 0.8rem;
+  color: #d9d9d9;
+  font-size: 0.85rem;
+}
+
+.my-list-remove-btn {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .my-list-container {
+    padding: 128px 1rem 1rem;
+  }
+}
+

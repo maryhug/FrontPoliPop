@@ -34,12 +34,25 @@ const LoginInicial: React.FC = () => {
             localStorage.setItem("token", data.token);
 
             // Construir payload base del usuario autenticado
-            let storedUser: any = {
+            let storedUser: {
+                id?: number;
+                email?: string;
+                username?: string;
+                role?: string;
+                gender?: string;
+                country?: string;
+                countryId?: number;
+                fullName?: string;
+                phone?: string;
+                birthdate?: string;
+            } = {
                 id: data.id,
                 email: data.email,
                 username: data.username,
                 role: data.role, // por si el backend ya lo trae
                 gender: data.gender,
+                country: data.country,
+                birthdate: data.birthdate,
             };
 
             // Intentar enriquecer con datos completos (incluye role) desde el backend
@@ -52,6 +65,10 @@ const LoginInicial: React.FC = () => {
                         username: backendUser.username ?? storedUser.username,
                         role: backendUser.role ?? storedUser.role,
                         gender: backendUser.gender ?? storedUser.gender,
+                        country: backendUser.country ?? storedUser.country,
+                        countryId: backendUser.countryId ?? storedUser.countryId,
+                        fullName: backendUser.fullName ?? storedUser.fullName,
+                        phone: backendUser.phone ?? storedUser.phone,
                         birthdate: backendUser.birthdate ?? storedUser.birthdate,
                     };
                 }

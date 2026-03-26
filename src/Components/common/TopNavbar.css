@@ -59,9 +59,30 @@
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-.navbar-logout {
+.navbar-actions {
     display: flex;
     align-items: center;
+    gap: .5rem;
+}
+
+.profile-button {
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    background: linear-gradient(135deg, rgba(124,58,237,.95), rgba(109,40,217,.95));
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.profile-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(124,58,237,.3);
 }
 
 .logout-button {
@@ -115,7 +136,7 @@
         gap: 1rem;
     }
 
-    .navbar-logout {
+    .navbar-actions {
         margin-top: 0.5rem;
     }
 }

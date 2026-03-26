@@ -1,0 +1,116 @@
+.profile-page {
+  min-height: calc(100vh - 72px);
+  margin-top: 72px;
+  padding: 2rem 1rem;
+  background: radial-gradient(circle at top right, rgba(114, 57, 177, 0.12), transparent 30%), #0a0a0a;
+  color: #fff;
+}
+
+.profile-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.profile-card {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  background: rgba(20, 20, 20, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+.profile-header h2 {
+  margin: 0;
+  font-size: 1.7rem;
+}
+
+.profile-header p {
+  margin: 0.5rem 0 0;
+  color: #c7c7c7;
+}
+
+.profile-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.65rem;
+  margin-top: 1.1rem;
+}
+
+.profile-form label {
+  margin-top: 0.65rem;
+  color: #d4d4d4;
+  font-weight: 600;
+  font-size: 0.94rem;
+}
+
+.profile-form input,
+.profile-form select {
+  border: 1px solid #3b3b3b;
+  border-radius: 10px;
+  background: #121212;
+  color: #fff;
+  padding: 0.7rem 0.75rem;
+  outline: none;
+}
+
+.profile-form input:focus,
+.profile-form select:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
+}
+
+.profile-alert {
+  margin-top: 1rem;
+  border-radius: 10px;
+  padding: 0.7rem 0.85rem;
+}
+
+.profile-alert-error {
+  background: rgba(220, 38, 38, 0.12);
+  border: 1px solid rgba(220, 38, 38, 0.45);
+  color: #fecaca;
+}
+
+.profile-alert-success {
+  background: rgba(22, 163, 74, 0.12);
+  border: 1px solid rgba(22, 163, 74, 0.45);
+  color: #bbf7d0;
+}
+
+.profile-actions {
+  margin-top: 1.2rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.7rem;
+}
+
+.profile-btn-primary,
+.profile-btn-secondary {
+  border: none;
+  border-radius: 10px;
+  padding: 0.65rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.profile-btn-primary {
+  background: linear-gradient(90deg, #7c3aed, #6d28d9);
+  color: #fff;
+}
+
+.profile-btn-secondary {
+  background: #2a2a2a;
+  color: #fff;
+}
+
+.profile-btn-primary:disabled,
+.profile-btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+

@@ -207,6 +207,42 @@
     flex-wrap: wrap;
 }
 
+.poster-actions {
+  padding: 0 .6rem .7rem;
+}
+
+.my-list-btn {
+  width: 100%;
+  border: 1px solid rgba(124,58,237,0.4);
+  border-radius: 8px;
+  background: rgba(124,58,237,0.2);
+  color: #fff;
+  padding: .45rem .55rem;
+  font-size: .85rem;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.my-list-btn:hover {
+  background: rgba(124,58,237,0.45);
+}
+
+.my-list-btn:disabled {
+  opacity: .7;
+  cursor: not-allowed;
+}
+
+.my-list-feedback {
+  margin-top: .8rem;
+  color: #d8ceff;
+  background: rgba(16, 12, 30, 0.85);
+  border: 1px solid rgba(124,58,237,0.35);
+  border-radius: 10px;
+  padding: .65rem .85rem;
+  z-index: 1;
+  position: relative;
+}
+
 .poster-rating {
     color: #ffd700;
     font-weight: 700;

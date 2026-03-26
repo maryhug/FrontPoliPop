@@ -56,6 +56,8 @@ const Catalog: React.FC = () => {
   // búsqueda
   const [query, setQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [addingMovieId, setAddingMovieId] = useState<number | null>(null);
+  const [myListMessage, setMyListMessage] = useState('');
 
   // Verificar autenticación al montar el componente
   useEffect(() => {
@@ -115,6 +117,31 @@ const Catalog: React.FC = () => {
     setQuery('');
     setIsSearching(false);
     await loadPopular();
+  };
+
+  const handleAddToMyList = async (
+    movie: CardMovie,
+    event: React.MouseEvent<HTMLButtonElement>,
+  ): Promise<void> => {
+    event.stopPropagation();
+    setMyListMessage('');
+    setAddingMovieId(movie.id);
+
+    try {
+      await apiService.addToMyList({
+        id: movie.id,
+        title: movie.title,
+        posterPath: movie.poster,
+        releaseDate: movie.year,
+        voteAverage: movie.rating,
+      });
+      setMyListMessage(`"${movie.title}" se agrego a Mi Lista.`);
+    } catch (e) {
+      console.error(e);
+      setMyListMessage('No se pudo agregar la pelicula a Mi Lista.');
+    } finally {
+      setAddingMovieId(null);
+    }
   };
 
   // Abrir modal con detalles de la película
@@ -234,13 +261,24 @@ const Catalog: React.FC = () => {
                )}
                <img className="poster-img" src={m.poster} alt={m.title} onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/logo.png'; }} />
                <div className="poster-title">{m.title}</div>
-               <div className="poster-sub">
-                 {/* Se eliminaron rating y año para no duplicar la información mostrada en badges */}
+               <div className="poster-actions">
+                 <button
+                   type="button"
+                   className="my-list-btn"
+                   onClick={(event) => {
+                     void handleAddToMyList(m, event);
+                   }}
+                   disabled={addingMovieId === m.id}
+                 >
+                   {addingMovieId === m.id ? 'Agregando...' : 'Agregar a Mi Lista'}
+                 </button>
                </div>
              </div>
            ))}
          </div>
        )}
+
+       {myListMessage && <div className="my-list-feedback">{myListMessage}</div>}
 
        {open && (
          <div className={"modal-backdrop" + (isClosing ? " closing" : "")} onClick={closeModal}>

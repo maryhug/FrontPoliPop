@@ -7,6 +7,8 @@ import TopNavBar from './Components/common/TopNavbar.tsx'; // Ajusta la ruta seg
 import AdminDashboard from './Components/admin/AdminDashboard.tsx';
 import { isAdmin } from './services/auth';
 import SectionUnavailable from './Components/common/SectionUnavailable.tsx';
+import MiLista from './Components/myList/MiLista.tsx';
+import Perfil from './Components/profile/perfil.tsx';
 
 const AppContent: React.FC = () => {
     const location = useLocation();
@@ -42,7 +44,11 @@ const AppContent: React.FC = () => {
                 />
                 <Route
                     path="/mi-lista"
-                    element={<SectionUnavailable title="Mi Lista" description="Tu lista personalizada estará disponible pronto." />}
+                    element={<MiLista />}
+                />
+                <Route
+                    path="/perfil"
+                    element={<Perfil />}
                 />
                 <Route
                     path="/"
